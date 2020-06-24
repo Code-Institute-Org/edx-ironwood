@@ -7,7 +7,6 @@ services:
   
   mongodb:
     image: docker.io/mongo:3.2.16
-    # Use WiredTiger in all environments, just like at edx.org
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     volumes:
       - /var/edx/data/mongodb:/data/db
@@ -32,13 +31,6 @@ services:
       - /var/edx/data/elasticsearch:/usr/share/elasticsearch/data
   
 
-#  openedx-assets:
-#    image: docker.io/overhangio/openedx:3.12.6
-#    volumes:
-#      - /var/edx/data/openedx:/var/www/openedx
-#    command: sh -c "rm -rf /var/www/openedx/staticfiles && cp -r /openedx/staticfiles/ /var/www/openedx/"
-
-
   nginx:
     image: docker.io/nginx:1.13
     ports:
@@ -48,7 +40,7 @@ services:
       default:
         aliases: []
     volumes:
-      - ./conf/nginx:/etc/nginx/conf.d/:ro
+      - /var/edx/nginx:/etc/nginx/conf.d/:ro
       - /var/edx/data/openedx:/var/www/openedx:ro
       - /var/edx/data/openedx-media:/var/www/openedx-media:ro
 
@@ -63,71 +55,50 @@ services:
     image: mailhog/mailhog:latest
   
 
-  ############# Forum
-
-  
-  forum:
-    image: docker.io/overhangio/openedx-forum:3.12.6
-    environment:
-      SEARCH_SERVER: "http://elasticsearch:9200"
-      MONGODB_AUTH: ""
-      MONGODB_HOST: "mongodb"
-      MONGODB_PORT: "27017"
-
-
-  ############# LMS and CMS
-
 
   ci-lms:
-    image: edx-patched-dev:latest  # docker.io/overhangio/openedx:3.12.6
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:latest
     environment:
       SERVICE_VARIANT: lms
       GUNICORN_WORKERS: 2
       SETTINGS: production
-    ports:
-      - "8000:8000"
     volumes:
-      - ./config/:/openedx/config/
-      - /var/edx/data/lms:/openedx/data
+      - /var/edx/config/:/openedx/config/
       - /var/edx/data/openedx-media:/openedx/media
 
 
   ci-cms:
-    image: edx-patched-dev:latest  # docker.io/overhangio/openedx:3.12.6
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:latest
     environment:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: 2
       SETTINGS: production
     volumes:
-      - ./config/:/openedx/config/
-      - /var/edx/data/lms:/openedx/data
+      - /var/edx/config/:/openedx/config/
       - /var/edx/data/openedx-media:/openedx/media
 
 
-  ############# LMS and CMS workers
-
-
   lms-worker:
-    image: edx-patched-dev:latest  # docker.io/overhangio/openedx:3.12.6
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:latest
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: production
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
+      C_FORCE_ROOT: "1"
     command: ./manage.py lms celery worker --loglevel=info --hostname=edx.lms.core.default.%%h --maxtasksperchild 100
     volumes:
-      - ./config/:/openedx/config/
+      - /var/edx/config/:/openedx/config/
       - /var/edx/data/lms:/openedx/data
       - /var/edx/data/openedx-media:/openedx/media
 
 
   cms-worker:
-    image: edx-patched-dev:latest  # docker.io/overhangio/openedx:3.12.6
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:latest
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: production
-      C_FORCE_ROOT: "1" # run celery tasks as root #nofear
+      C_FORCE_ROOT: "1"
     command: ./manage.py cms celery worker --loglevel=info --hostname=edx.cms.core.default.%%h --maxtasksperchild 100
     volumes:
-      - ./config/:/openedx/config/
+      - /var/edx/config/:/openedx/config/
       - /var/edx/data/lms:/openedx/data
       - /var/edx/data/openedx-media:/openedx/media
