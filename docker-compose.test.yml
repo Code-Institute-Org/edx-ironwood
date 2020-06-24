@@ -69,7 +69,6 @@ services:
     depends_on:
       - mysql
       - elasticsearch
-      - forum
       - memcached
       - mongodb
       - rabbitmq
