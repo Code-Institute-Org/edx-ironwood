@@ -56,7 +56,7 @@ services:
     image: edx-patched-dev:latest
     environment:
       SETTINGS: production
-      DEBUG: "False"
+      DEBUG: "True"
 #    command: ./manage.py lms runserver 0.0.0.0:8000
     volumes:
       - ./config/:/openedx/config/
@@ -83,7 +83,7 @@ services:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: 2
       SETTINGS: production
-      DEBUG: "False"
+      DEBUG: "True"
     restart: unless-stopped
 #    command: ./manage.py cms runserver 0.0.0.0:8000
     ports:

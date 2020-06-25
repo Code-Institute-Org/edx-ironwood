@@ -1123,8 +1123,9 @@ derive_settings(__name__)
 
 ################################ DEBUG TOOLBAR ################################
 
+INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+
 if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
 
     MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
     INTERNAL_IPS = ('127.0.0.1',)
@@ -1147,14 +1148,11 @@ if DEBUG:
         'DISABLE_PANELS': (
             'debug_toolbar.panels.profiling.ProfilingPanel',
         ),
-        'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar',
+        'SHOW_TOOLBAR_CALLBACK': 'lms.envs.production.should_show_debug_toolbar',
     }
 
 
     def should_show_debug_toolbar(request):
-        # We always want the toolbar on devstack unless running tests from another Docker container
-        if request.get_host().startswith('edx.devstack.studio:'):
-            return False
         return True
 
 

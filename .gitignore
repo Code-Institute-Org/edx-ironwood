@@ -92,7 +92,6 @@ common/test/db_cache/bok_choy_*.yaml
 .prereqs_cache
 .vagrant/
 node_modules
-bin/
 
 ### Static assets pipeline artifacts
 *.scssc
