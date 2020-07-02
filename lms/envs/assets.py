@@ -1,7 +1,7 @@
 """
 Bare minimum settings for collecting production assets.
 """
-from ..common import *
+from .common import *
 from openedx.core.lib.derived import derive_settings
 
 COMPREHENSIVE_THEME_DIRS.append('/openedx/themes')
@@ -16,7 +16,7 @@ DATABASES = {
     "default": {},
 }
 
-STATIC_ROOT = path(STATIC_ROOT_BASE) / 'studio'
+STATIC_ROOT = path(STATIC_ROOT_BASE)
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 derive_settings(__name__)

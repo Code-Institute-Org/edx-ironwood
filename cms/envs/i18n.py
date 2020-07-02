@@ -1,4 +1,4 @@
-from ..common import *
+from .common import *
 from openedx.core.lib.derived import derive_settings
 
 STATIC_ROOT_BASE = '/openedx/staticfiles'

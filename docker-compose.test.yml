@@ -56,12 +56,13 @@ services:
     image: edx-patched-dev:latest
     environment:
       SETTINGS: production
-      DEBUG: "True"
+      DEBUG: "False"
 #    command: ./manage.py lms runserver 0.0.0.0:8000
     volumes:
       - ./config/:/openedx/config/
       - ./lms:/openedx/edx-platform/lms
       - ./common:/openedx/edx-platform/common
+      - ../test-theme:/openedx/themes/ci-theme
     ports:
       - "8000:8000"
     stdin_open: true
@@ -83,9 +84,9 @@ services:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: 2
       SETTINGS: production
-      DEBUG: "True"
+      DEBUG: "False"
     restart: unless-stopped
-#    command: ./manage.py cms runserver 0.0.0.0:8000
+    command: ./manage.py cms runserver 0.0.0.0:8000
     ports:
       - "8001:8000"
     stdin_open: true
@@ -128,4 +129,5 @@ services:
     volumes:
       - ./conf/nginx:/etc/nginx/conf.d/:ro
       - /var/edx/data/openedx:/var/www/openedx:ro
+#      - /home/ray/Desktop/staticexport:/var/www/openedx:ro
       - /var/edx/data/openedx-media:/var/www/openedx-media:ro

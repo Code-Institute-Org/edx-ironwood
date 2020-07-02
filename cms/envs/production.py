@@ -87,10 +87,8 @@ CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
-
 if DEBUG:
-
+    INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
     MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
     INTERNAL_IPS = ('127.0.0.1',)
 

@@ -1123,10 +1123,9 @@ derive_settings(__name__)
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
 
 if DEBUG:
-
+    INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
     MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
     INTERNAL_IPS = ('127.0.0.1',)
 
@@ -1165,3 +1164,6 @@ if DEBUG:
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
+# Have to put a hacky fix in here for the fact that the mongodb server used for the DOC_STORE is hardcoded as localhost
+for store in MODULESTORE['default']['OPTIONS']['stores']:
+    store['DOC_STORE_CONFIG']['host'] = CONTENTSTORE['DOC_STORE_CONFIG']['host']

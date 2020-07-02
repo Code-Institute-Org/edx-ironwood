@@ -25,21 +25,6 @@ RUN virtualenv /openedx/venv
 ENV PATH /openedx/venv/bin:${PATH}
 ENV VIRTUAL_ENV /openedx/venv/
 RUN pip install setuptools==39.0.1 pip==9.0.3
-RUN pip install -r requirements/edx/base.txt
-
-# Install patched version of ora2
-RUN pip uninstall -y ora2 && \
-    pip install git+https://github.com/overhangio/edx-ora2.git@2.2.0-patched#egg=ora2==2.2.0
-
-# Install patched version of edx-oauth2-provider
-RUN pip install git+https://github.com/overhangio/edx-oauth2-provider.git@1.2.3#egg=edx-oauth2-provider==1.2.3
-
-# Install ironwood-compatible scorm xblock
-RUN pip install "openedx-scorm-xblock<10.0.0,>=9.2.0"
-
-# Install development libraries
-RUN pip install -r requirements/edx/ci-dev.txt
-
 
 # Using local version
 COPY ./lms/ /openedx/edx-platform/lms
@@ -57,7 +42,6 @@ COPY ./docs/ /openedx/edx-platform/docs
 COPY ./openedx/ /openedx/edx-platform/openedx
 COPY ./pavelib/ /openedx/edx-platform/pavelib
 COPY ./scripts/ /openedx/edx-platform/scripts
-COPY ./settings/ /openedx/edx-platform/settings
 COPY ./vendor_extra/ /openedx/edx-platform/vendor_extra
 COPY ./webpack-config/ /openedx/edx-platform/webpack-config
 COPY ./themes/ /openedx/edx-platform/themes
@@ -85,6 +69,23 @@ COPY ./pylintrc /openedx/edx-platform/
 COPY ./pylintrc_tweaks /openedx/edx-platform/
 COPY ./tox.ini /openedx/edx-platform/
 
+RUN pip install -r requirements/edx/base.txt
+
+# Install patched version of ora2
+RUN pip uninstall -y ora2 && \
+    pip install git+https://github.com/overhangio/edx-ora2.git@2.2.0-patched#egg=ora2==2.2.0
+
+# Install patched version of edx-oauth2-provider
+RUN pip install git+https://github.com/overhangio/edx-oauth2-provider.git@1.2.3#egg=edx-oauth2-provider==1.2.3
+
+# Install ironwood-compatible scorm xblock
+RUN pip install "openedx-scorm-xblock<10.0.0,>=9.2.0"
+
+# Install development libraries
+RUN pip install -r requirements/edx/ci-dev.txt
+
+
+
 # Install edx local
 RUN pip install -e .
 
@@ -103,18 +104,7 @@ RUN npm set progress=false \
     && npm install --verbose --registry=$NPM_REGISTRY
 ENV PATH ./node_modules/.bin:${PATH}
 
-# Install private requirements: this is useful for installing custom xblocks.
-#COPY ./requirements/ /openedx/requirements
-#RUN cd /openedx/requirements/ \
-#  && touch ./private.txt \
-#  && pip install -r ./private.txt
-
-# Create folder that will store *.env.json and *.auth.json files, as well as
-# the tutor-specific settings files.
-RUN mkdir -p /openedx/config ./lms/envs/tutor ./cms/envs/tutor
 ENV CONFIG_ROOT /openedx/config
-COPY settings/lms/*.py ./lms/envs/tutor/
-COPY settings/cms/*.py ./cms/envs/tutor/
 
 # Copy user-specific locales to /openedx/locale/user/locale and compile them
 RUN mkdir -p /openedx/locale/user
@@ -124,8 +114,8 @@ RUN cd /openedx/locale/user && \
 # Compile i18n strings: in Ironwood, js locales are not properly compiled out of the box
 # and we need to do a pass ourselves. Also, we need to compile the djangojs.js files for
 # the downloaded locales.
-RUN ./manage.py lms --settings=tutor.i18n compilejsi18n
-RUN ./manage.py cms --settings=tutor.i18n compilejsi18n
+RUN ./manage.py lms --settings=i18n compilejsi18n
+RUN ./manage.py cms --settings=i18n compilejsi18n
 
 # Copy scripts
 COPY ./bin /openedx/bin
@@ -148,7 +138,7 @@ RUN openedx-assets xmodule \
     && openedx-assets common
 COPY ./themes/ /openedx/themes/
 RUN openedx-assets themes \
-    && openedx-assets collect --settings=tutor.assets
+    && openedx-assets collect --settings=assets
 
 # Create a data directory, which might be used (or not)
 RUN mkdir /openedx/data
