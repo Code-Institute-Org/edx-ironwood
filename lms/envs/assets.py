@@ -23,3 +23,8 @@ derive_settings(__name__)
 
 LOCALE_PATHS.append("/openedx/locale/contrib/locale")
 LOCALE_PATHS.append("/openedx/locale/user/locale")
+
+# Adding debug toolbar here because I want the debug toolbar static assets
+# for local debugging, when DEBUG=True
+INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')

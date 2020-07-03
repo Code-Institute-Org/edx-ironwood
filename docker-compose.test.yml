@@ -1,10 +1,64 @@
 version: "3.7"
 services:
-  
+
+  ci-lms:
+    image: edx-patched-dev:latest
+    environment:
+      SETTINGS: production
+      DEBUG: "False"
+#    command: ./manage.py lms runserver 0.0.0.0:8000
+    volumes:
+      - ./config/:/openedx/config/                       # required to load env config
+      - ./lms:/openedx/edx-platform/lms                  # debug mount for lms code
+      - ./common:/openedx/edx-platform/common            # debug mount for common code
+      - ../ci-new-theme:/openedx/themes/ci-theme         # required for theme registration and templates
+      - ../ci-new-theme/staticfiles:/openedx/staticfiles # required to allow lms to find static files
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mysql
+      - elasticsearch
+      - memcached
+      - mongodb
+      - rabbitmq
+      - smtp
+      - lms-worker
+      - nginx
+
+
+  ci-cms:
+    image: edx-patched-dev:latest
+    environment:
+      SERVICE_VARIANT: cms
+      GUNICORN_WORKERS: 2
+      SETTINGS: production
+      DEBUG: "True"
+    restart: unless-stopped
+#    command: ./manage.py cms runserver 0.0.0.0:8000
+    ports:
+      - "8001:8000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./config/:/openedx/config/
+      - ./cms:/openedx/edx-platform/cms
+      - ./common:/openedx/edx-platform/common
+    depends_on:
+      - mysql
+      - elasticsearch
+      - memcached
+      - mongodb
+      - rabbitmq
+      - smtp
+
+
   memcached:
     image: docker.io/memcached:1.4.38
     restart: unless-stopped
-  
+
+ 
   mongodb:
     image: docker.io/mongo:3.2.16
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
@@ -12,7 +66,7 @@ services:
     volumes:
       - /var/edx/data/mongodb:/data/db
 
-  
+
   mysql:
     image: docker.io/mysql:5.6.36
     command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
@@ -51,59 +105,6 @@ services:
     ports:
       - "8025:8025"
   
-  
-  ci-lms:
-    image: edx-patched-dev:latest
-    environment:
-      SETTINGS: production
-      DEBUG: "False"
-#    command: ./manage.py lms runserver 0.0.0.0:8000
-    volumes:
-      - ./config/:/openedx/config/
-      - ./lms:/openedx/edx-platform/lms
-      - ./common:/openedx/edx-platform/common
-      - ../test-theme:/openedx/themes/ci-theme
-    ports:
-      - "8000:8000"
-    stdin_open: true
-    tty: true
-    depends_on:
-      - mysql
-      - elasticsearch
-      - memcached
-      - mongodb
-      - rabbitmq
-      - smtp
-      - lms-worker
-      - nginx
-
-
-  ci-cms:
-    image: edx-patched-dev:latest
-    environment:
-      SERVICE_VARIANT: cms
-      GUNICORN_WORKERS: 2
-      SETTINGS: production
-      DEBUG: "False"
-    restart: unless-stopped
-    command: ./manage.py cms runserver 0.0.0.0:8000
-    ports:
-      - "8001:8000"
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./config/:/openedx/config/
-      - ./cms:/openedx/edx-platform/cms
-      - ./common:/openedx/edx-platform/common
-    depends_on:
-      - mysql
-      - elasticsearch
-      - memcached
-      - mongodb
-      - rabbitmq
-      - smtp
-
-
 
   lms-worker:
     image: edx-patched-dev:latest
@@ -129,5 +130,4 @@ services:
     volumes:
       - ./conf/nginx:/etc/nginx/conf.d/:ro
       - /var/edx/data/openedx:/var/www/openedx:ro
-#      - /home/ray/Desktop/staticexport:/var/www/openedx:ro
       - /var/edx/data/openedx-media:/var/www/openedx-media:ro

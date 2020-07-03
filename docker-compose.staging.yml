@@ -57,7 +57,7 @@ services:
 
 
   ci-lms:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.1
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
     environment:
       SERVICE_VARIANT: lms
       GUNICORN_WORKERS: 2
@@ -68,7 +68,7 @@ services:
 
 
   ci-cms:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.1
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
     environment:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: 2
@@ -79,7 +79,7 @@ services:
 
 
   lms-worker:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.1
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: production
@@ -92,7 +92,7 @@ services:
 
 
   cms-worker:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.1
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: production
