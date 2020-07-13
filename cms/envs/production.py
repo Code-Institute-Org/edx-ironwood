@@ -667,3 +667,13 @@ STATIC_ROOT = ENV_ROOT / "staticfiles/studio"
 # Have to put a hacky fix in here for the fact that the mongodb server used for the DOC_STORE is hardcoded as localhost
 for store in MODULESTORE['default']['OPTIONS']['stores']:
     store['DOC_STORE_CONFIG']['host'] = CONTENTSTORE['DOC_STORE_CONFIG']['host']
+
+
+# Sentry
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
+if SENTRY_DSN:
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])

@@ -5,14 +5,15 @@ services:
     image: edx-patched-dev:latest
     environment:
       SETTINGS: production
-      DEBUG: "False"
+      DEBUG: "True"
 #    command: ./manage.py lms runserver 0.0.0.0:8000
     volumes:
       - ./config/:/openedx/config/                       # required to load env config
       - ./lms:/openedx/edx-platform/lms                  # debug mount for lms code
       - ./common:/openedx/edx-platform/common            # debug mount for common code
       - ../ci-new-theme:/openedx/themes/ci-theme         # required for theme registration and templates
-      - ../ci-new-theme/staticfiles:/openedx/staticfiles # required to allow lms to find static files
+      #- ../ci-new-theme/staticfiles:/openedx/staticfiles # required to allow lms to find static files
+      - ../ci-new-theme/lms/static:/openedx/staticfiles/ci-theme/lms/static # required to allow lms to find static files
     ports:
       - "8000:8000"
     stdin_open: true
@@ -129,5 +130,6 @@ services:
       - "80:80"
     volumes:
       - ./conf/nginx:/etc/nginx/conf.d/:ro
-      - /var/edx/data/openedx:/var/www/openedx:ro
+      - /var/edx/data/openedx:/var/www/openedx
+      - ../ci-new-theme/lms/static:/var/www/openedx/staticfiles/ci-theme  # theme override
       - /var/edx/data/openedx-media:/var/www/openedx-media:ro

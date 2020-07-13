@@ -53,11 +53,14 @@ services:
   
   smtp:
     image: mailhog/mailhog:latest
-  
-
+    volumes:
+      - /var/edx/mailhog/:/auth
+    environment:
+      MH_AUTH_FILE: "/auth/mailhog.pass"
+ 
 
   ci-lms:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.3
     environment:
       SERVICE_VARIANT: lms
       GUNICORN_WORKERS: 2
@@ -66,9 +69,12 @@ services:
       - /var/edx/config/:/openedx/config/
       - /var/edx/data/openedx-media:/openedx/media
 
+      - /var/edx/data/ci-theme/:/openedx/themes/ci-theme                           # required for theme registration and templates
+      - /var/edx/data/openedx/staticfiles:/openedx/staticfiles
+
 
   ci-cms:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.3
     environment:
       SERVICE_VARIANT: cms
       GUNICORN_WORKERS: 2
@@ -76,10 +82,11 @@ services:
     volumes:
       - /var/edx/config/:/openedx/config/
       - /var/edx/data/openedx-media:/openedx/media
+      - /var/edx/data/edx:/edx                      # required to allow uploaded files to be shared with cms-worker
 
 
   lms-worker:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.3
     environment:
       SERVICE_VARIANT: lms
       SETTINGS: production
@@ -92,7 +99,7 @@ services:
 
 
   cms-worker:
-    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.2
+    image: 949266541515.dkr.ecr.eu-west-1.amazonaws.com/ci-edx-platform:0.3
     environment:
       SERVICE_VARIANT: cms
       SETTINGS: production
@@ -102,3 +109,4 @@ services:
       - /var/edx/config/:/openedx/config/
       - /var/edx/data/lms:/openedx/data
       - /var/edx/data/openedx-media:/openedx/media
+      - /var/edx/data/edx:/edx                      # required to allow uploaded files to be shared with cms

@@ -155,6 +155,10 @@ RUN chmod a+x /openedx/bin/*
 ARG USERID=1000
 RUN create-user.sh $USERID
 
+# Root level /edx folder required for file uploads (from CMS)
+RUN mkdir /edx
+RUN chown openedx:openedx /edx
+
 # Default django settings
 
 # Entrypoint will set right environment variables
